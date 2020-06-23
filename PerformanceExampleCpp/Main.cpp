@@ -5,14 +5,17 @@
 #include <ctime>
 #include <chrono>
 #include <iostream>
+#include <thread>
+#include <future>
 
 double Random() { return (double)rand() / RAND_MAX; }
 
 std::vector<Polyline> CreateTestData()
 {
+    static const int numberOfPolylines = 50000;
+    static const int numberOfPoints = 1000;
+
     Stopwatch stopwatch{ "Creating test data" };
-    const int numberOfPolylines = 50000;
-    const int numberOfPoints = 1000;
 
     std::vector<Polyline> testData;
     testData.reserve(numberOfPolylines);
@@ -59,6 +62,59 @@ Box CachedBoxesPerLine(const std::vector<Polyline>& polylines)
     return box;
 }
 
+void Worker(std::vector<Polyline>::const_iterator begin, std::vector<Polyline>::const_iterator end, std::promise<Box> result)
+{
+    Box box{ begin->Points()[0] };
+    while (begin != end)
+    {
+        for (const auto& point : begin->Points())
+        {
+            box.Enclose(point);
+        }
+
+        ++begin;
+    }
+
+    result.set_value(box);
+}
+
+Box Multithreaded(const std::vector<Polyline>& polylines)
+{
+    static const int numberOfThreads = 8;
+    Stopwatch stopwatch{ "Multithreaded" };
+
+    std::vector<std::future<Box>> futures;
+    futures.reserve(numberOfThreads);
+
+    std::vector<std::thread> threads;
+    threads.reserve(numberOfThreads);
+
+    const auto junkSize = polylines.size() / numberOfThreads;
+    for (int i = 0; i < numberOfThreads; ++i)
+    {
+        std::promise<Box> promise;
+        futures.push_back(promise.get_future());
+
+        const auto begin = polylines.cbegin() + i * junkSize;
+        const auto end = begin + junkSize;
+        threads.emplace_back(Worker, begin, end, std::move(promise));
+    }
+
+    Box box{ polylines[0].Points()[0] };
+
+    for (auto& thread : threads)
+    {
+        thread.join();
+    }
+
+    for (auto& future : futures)
+    {
+        box.Enclose(future.get());
+    }
+
+    return box;
+}
+
 int main(int argc, char* argv[])
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -75,6 +131,11 @@ int main(int argc, char* argv[])
     std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
     std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
     std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
+
+    std::cout << " - " << Multithreaded(testData).Center() << "\n";
+    std::cout << " - " << Multithreaded(testData).Center() << "\n";
+    std::cout << " - " << Multithreaded(testData).Center() << "\n";
+    std::cout << " - " << Multithreaded(testData).Center() << "\n";
 
     return 0;
 }

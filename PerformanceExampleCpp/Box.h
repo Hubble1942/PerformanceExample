@@ -14,6 +14,11 @@ public:
         : _min{ point }, _max{ point }
     {}
 
+    // The default ctor is only required due to a bug in the Microsoft STL:
+    // See https://developercommunity.visualstudio.com/content/problem/372171/stdpromise-doesnt-support-types-that-are-not-defau.html
+    Box()
+    {}
+
     Point3D Min() const { return _min; }
     Point3D Max() const { return _max; }
 
