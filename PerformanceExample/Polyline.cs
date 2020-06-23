@@ -49,7 +49,7 @@ namespace PerformanceExample
         public void Add(Point3D point)
         {
             this.points.Add(point);
-            this.BoundingBox = this.BoundingBox.Enclose(point);
+            this.BoundingBox.Enclose(point);
         }
 
         /// <summary>

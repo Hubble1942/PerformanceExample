@@ -5,8 +5,11 @@ namespace PerformanceExample
     /// <summary>
     /// A box defined by two corner points.
     /// </summary>
-    public struct Box
+    public sealed class Box
     {
+        private Point3D min;
+        private Point3D max;
+
         /// <summary>
         /// Returns true if this box is valid.
         /// </summary>
@@ -15,12 +18,12 @@ namespace PerformanceExample
         /// <summary>
         /// Gets the minimum corner point.
         /// </summary>
-        public Point3D Min { get; private set; }
+        public Point3D Min => this.min;
 
         /// <summary>
         /// Gets the maximum corner point.
         /// </summary>
-        public Point3D Max { get; private set; }
+        public Point3D Max => this.max;
 
         /// <summary>
         /// Gets the center point.
@@ -28,55 +31,48 @@ namespace PerformanceExample
         public Point3D Center => (Point3D)(((Vector3D)this.Min + (Vector3D)this.Max) / 2.0);
 
         /// <summary>
-        /// Creates an extended box enclosing both, this instance and the specified point.
+        /// Extends this box to enclosing the specified point.
         /// </summary>
         /// <param name="point">The point.</param>
-        /// <returns>The extended box.</returns>
+        /// <returns>This instance.</returns>
         public Box Enclose(Point3D point)
         {
             if (this.IsValid)
             {
-                return new Box
-                {
-                    Min = new Point3D(
-                        Util.Min(this.Min.X, point.X),
-                        Util.Min(this.Min.Y, point.Y),
-                        Util.Min(this.Min.Z, point.Z)),
-                    Max = new Point3D(
-                        Util.Max(this.Max.X, point.X),
-                        Util.Max(this.Max.Y, point.Y),
-                        Util.Max(this.Max.Z, point.Z)),
-                    IsValid = true,
-                };
+                this.min.X = Util.Min(this.min.X, point.X);
+                this.min.Y = Util.Min(this.min.Y, point.Y);
+                this.min.Z = Util.Min(this.min.Z, point.Z);
+
+                this.max.X = Util.Max(this.max.X, point.X);
+                this.max.Y = Util.Max(this.max.Y, point.Y);
+                this.max.Z = Util.Max(this.max.Z, point.Z);
             }
             else
             {
-                return new Box
-                {
-                    Min = point,
-                    Max = point,
-                    IsValid = true,
-                };
+                this.min = point;
+                this.max = point;
+                this.IsValid = true;
             }
+
+            return this;
         }
 
         /// <summary>
-        /// Creates an extended box enclosing both, this instance and the specified other box.
+        /// Extends this box to enclosing the specified other box.
         /// </summary>
         /// <param name="other">The other box.</param>
         /// <returns>
-        /// The extended box.
+        /// This instance.
         /// </returns>
         public Box Enclose(Box other)
         {
             if (other.IsValid)
             {
-                return this.Enclose(other.Min).Enclose(other.Max);
+                this.Enclose(other.Min);
+                this.Enclose(other.Max);
             }
-            else
-            {
-                return this;
-            }
+
+            return this;
         }
     }
 }
