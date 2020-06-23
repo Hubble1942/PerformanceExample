@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace PerformanceExample
         /// <summary>
         /// Original code.
         /// </summary>
-        public static Point3D CalculateOriginal(IEnumerable<IEnumerable<Point3D>> polylines)
+        public static Point3D CalculateOriginal(IEnumerable<Polyline> polylines)
         {
             var minValues = new Point3D(double.MaxValue, double.MaxValue, double.MaxValue);
             var maxValues = new Point3D(double.MinValue, double.MinValue, double.MinValue);
@@ -50,7 +50,7 @@ namespace PerformanceExample
         /// - Use Parallel.For instead of for. 334 ms => 113 ms. With 4 (8) cores, ProcessorCount = 8. 
         ///   When all thread pool threads are in use (sleeping), without SetMinThreads => 423 ms (!).
         /// </remarks>
-        public static Point3D CalculatePerformanceOptimized(List<List<Point3D>> polylines)
+        public static Point3D CalculatePerformanceOptimized(List<Polyline> polylines)
         {
             ThreadPool.GetMinThreads(out int workerThreads, out int completionPortThreads);
             int sufficientWorkerThreads = workerThreads + 2 * Environment.ProcessorCount;
@@ -72,7 +72,7 @@ namespace PerformanceExample
                 double innerMaxY = double.MinValue;
                 double innerMaxZ = double.MinValue;
 
-                List<Point3D> line = polylines[polylineIndex];
+                var line = polylines[polylineIndex];
                 for (int pointIndex = 0; pointIndex < line.Count; pointIndex++)
                 {
                     Point3D point = line[pointIndex];

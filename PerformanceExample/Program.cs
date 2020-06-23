@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Windows.Media.Media3D;
 
@@ -12,11 +13,15 @@ namespace PerformanceExample
         {
             Console.WriteLine("Program started.");
 
-            List<List<Point3D>> inputData = CreateInputData();
-
-            var stopwatch = new Stopwatch();
-            Point3D result;
             long usedMilliseconds;
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Restart();
+            var inputData = CreateInputData();
+            usedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"InputData created in {usedMilliseconds} milliseconds.");
+
+            Point3D result;
 
             ThreadPool.QueueUserWorkItem(SleepABit, new Object());
             ThreadPool.QueueUserWorkItem(SleepABit, new Object());
@@ -73,29 +78,16 @@ namespace PerformanceExample
             Console.WriteLine($"Optimized calculation of {result} used {usedMilliseconds} milliseconds.");
 
             Console.WriteLine("Program finished.");
-            Console.ReadKey();
         }
 
-        private static List<List<Point3D>> CreateInputData()
+        private static List<Polyline> CreateInputData()
         {
             const int numberOfPolylines = 50000;
             const int numberOfPoints = 1000;
 
-            List<List<Point3D>> returnValue = new List<List<Point3D>>();
-
-            for (int iPolyline = 0; iPolyline < numberOfPolylines; iPolyline++)
-            {
-                var newPolyline = new List<Point3D>();
-                
-                for (int iPoint = 0; iPoint < numberOfPoints; iPoint++)
-                {
-                    newPolyline.Add(new Point3D(iPolyline + iPoint, iPolyline + iPoint, iPolyline + iPoint));
-                }
-
-                returnValue.Add(newPolyline);
-            }
-
-            return returnValue;
+            return Enumerable.Range(0, numberOfPolylines)
+                .Select(i => new Polyline(Enumerable.Range(0, numberOfPoints).Select(j => new Point3D(i + j, i + j, i + j))))
+                .ToList();
         }
 
         private static void SleepABit(Object theObject)
