@@ -47,7 +47,7 @@ namespace PerformanceExample
         /// - Replaced IEnumerable with List: 1749 ms => 1229 ms.
         /// - Replaced Math.Min and Math.Max with "if smaller/larger => assign". 1229 ms => 984 ms.
         /// - Use double instead of Point3D for intermediate results. 984 ms => 934 ms.
-        /// - Use for loops instead of forech loops. 934 ms => 334 ms.
+        /// - Use for loops instead of foreach loops. 934 ms => 334 ms.
         /// - Use Parallel.For instead of for. 334 ms => 113 ms. With 4 (8) cores, ProcessorCount = 8. 
         ///   When all thread pool threads are in use (sleeping), without SetMinThreads => 423 ms (!).
         /// </remarks>
@@ -105,15 +105,18 @@ namespace PerformanceExample
 
         public static Point3D CalculateV3(IEnumerable<Polyline> polylines)
         {
-            return polylines.Aggregate(new Box(), (box, line) => box.Enclose(line.BoundingBox)).Center;
+            var initialPoint = polylines.SelectMany(line => line).FirstOrDefault();
+            return polylines.Aggregate(new Box(initialPoint), (box, line) => box.Enclose(line.BoundingBox)).Center;
         }
 
         public static Point3D CalculateV4(IEnumerable<Polyline> polylines)
         {
+            var initialPoint = polylines.SelectMany(line => line).FirstOrDefault();
+
             return polylines
                 .AsParallel()
-                .Select(line => line.Aggregate(new Box(), (box, point) => box.Enclose(point)))
-                .Aggregate(new Box(), (b1, b2) => b1.Enclose(b2)).Center;
+                .Select(line => line.Aggregate(new Box(line[0]), (box, point) => box.Enclose(point)))
+                .Aggregate(new Box(initialPoint), (b1, b2) => b1.Enclose(b2)).Center;
         }
     }
 }

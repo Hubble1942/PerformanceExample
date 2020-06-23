@@ -23,7 +23,11 @@ namespace PerformanceExample
         public Polyline(IEnumerable<Point3D> points)
         {
             this.points = points.ToList();
-            this.BoundingBox = this.points.Aggregate(new Box(), (box, p) => box.Enclose(p));
+
+            if (this.points.Count > 0)
+            {
+                this.BoundingBox = this.points.Aggregate(new Box(this.points[0]), (box, p) => box.Enclose(p));
+            }
         }
 
         /// <summary>
@@ -49,7 +53,7 @@ namespace PerformanceExample
         public void Add(Point3D point)
         {
             this.points.Add(point);
-            this.BoundingBox.Enclose(point);
+            this.BoundingBox = this.BoundingBox?.Enclose(point) ?? new Box(point);
         }
 
         /// <summary>

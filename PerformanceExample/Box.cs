@@ -10,10 +10,11 @@ namespace PerformanceExample
         private Point3D min;
         private Point3D max;
 
-        /// <summary>
-        /// Returns true if this box is valid.
-        /// </summary>
-        public bool IsValid { get; private set; }
+        public Box(Point3D point)
+        {
+            this.min = point;
+            this.max = point;
+        }
 
         /// <summary>
         /// Gets the minimum corner point.
@@ -37,22 +38,14 @@ namespace PerformanceExample
         /// <returns>This instance.</returns>
         public Box Enclose(Point3D point)
         {
-            if (this.IsValid)
-            {
-                this.min.X = Util.Min(this.min.X, point.X);
-                this.min.Y = Util.Min(this.min.Y, point.Y);
-                this.min.Z = Util.Min(this.min.Z, point.Z);
 
-                this.max.X = Util.Max(this.max.X, point.X);
-                this.max.Y = Util.Max(this.max.Y, point.Y);
-                this.max.Z = Util.Max(this.max.Z, point.Z);
-            }
-            else
-            {
-                this.min = point;
-                this.max = point;
-                this.IsValid = true;
-            }
+            this.min.X = Util.Min(this.min.X, point.X);
+            this.min.Y = Util.Min(this.min.Y, point.Y);
+            this.min.Z = Util.Min(this.min.Z, point.Z);
+
+            this.max.X = Util.Max(this.max.X, point.X);
+            this.max.Y = Util.Max(this.max.Y, point.Y);
+            this.max.Z = Util.Max(this.max.Z, point.Z);
 
             return this;
         }
@@ -66,11 +59,8 @@ namespace PerformanceExample
         /// </returns>
         public Box Enclose(Box other)
         {
-            if (other.IsValid)
-            {
-                this.Enclose(other.Min);
-                this.Enclose(other.Max);
-            }
+            this.Enclose(other.Min);
+            this.Enclose(other.Max);
 
             return this;
         }
