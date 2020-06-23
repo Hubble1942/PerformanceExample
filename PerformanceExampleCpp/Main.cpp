@@ -46,6 +46,19 @@ Box Simple(const std::vector<Polyline>& polylines)
     return box;
 }
 
+Box CachedBoxesPerLine(const std::vector<Polyline>& polylines)
+{
+    Stopwatch stopwatch{ "CachedBoxesPerLine" };
+    Box box{ *polylines[0].BoundingBox() };
+
+    for (const auto& polyline : polylines)
+    {
+        box.Enclose(*polyline.BoundingBox());
+    }
+
+    return box;
+}
+
 int main(int argc, char* argv[])
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -57,6 +70,11 @@ int main(int argc, char* argv[])
     std::cout << " - " << Simple(testData).Center() << "\n";
     std::cout << " - " << Simple(testData).Center() << "\n";
     std::cout << " - " << Simple(testData).Center() << "\n";
+
+    std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
+    std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
+    std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
+    std::cout << " - " << CachedBoxesPerLine(testData).Center() << "\n";
 
     return 0;
 }
