@@ -79,6 +79,24 @@ namespace PerformanceExample
             usedMilliseconds = stopwatch.ElapsedMilliseconds;
             Console.WriteLine($"Optimized calculation of {result} used {usedMilliseconds} milliseconds.");
 
+            stopwatch.Restart();
+            result = BoundingBoxCalculator.CalculateV3(inputData);
+            usedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"Cache warmed in {usedMilliseconds} milliseconds. Result: ({result}).");
+
+            stopwatch.Restart();
+            result = BoundingBoxCalculator.CalculateV3(inputData);
+            usedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"Calculation V3 of {result} used {usedMilliseconds} milliseconds.");
+            stopwatch.Restart();
+            result = BoundingBoxCalculator.CalculateV3(inputData);
+            usedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"Calculation V3 of {result} used {usedMilliseconds} milliseconds.");
+            stopwatch.Restart();
+            result = BoundingBoxCalculator.CalculateV3(inputData);
+            usedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"Calculation V3 of {result} used {usedMilliseconds} milliseconds.");
+
             Console.WriteLine("Program finished.");
         }
 

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
@@ -100,6 +102,11 @@ namespace PerformanceExample
             ThreadPool.SetMinThreads(workerThreads, completionPortThreads);
 
             return new Point3D(minX + maxX / 2.0, minY + maxY / 2.0, minZ + maxZ / 2.0);
+        }
+
+        public static Point3D CalculateV3(IEnumerable<Polyline> polylines)
+        {
+            return polylines.Aggregate(new Box(), (box, line) => box.Enclose(line.BoundingBox)).Center;
         }
     }
 }

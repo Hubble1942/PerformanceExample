@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Box.cs" />
     <Compile Include="BoundingBoxCalculator.cs" />
     <Compile Include="Polyline.cs" />
     <Compile Include="Program.cs" />
