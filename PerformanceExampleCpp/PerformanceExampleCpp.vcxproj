@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
+    <ClInclude Include="ctpl_stl.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="Polyline.h" />
     <ClInclude Include="Stopwatch.h" />

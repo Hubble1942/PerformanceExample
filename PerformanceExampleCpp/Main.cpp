@@ -1,6 +1,8 @@
 
 #include "Polyline.h"
 #include "Stopwatch.h"
+#include "ctpl_stl.h"
+
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
@@ -115,6 +117,41 @@ Box Multithreaded(const std::vector<Polyline>& polylines)
     return box;
 }
 
+Box ThreadPooled(const std::vector<Polyline>& polylines, ctpl::thread_pool& pool)
+{
+    Stopwatch stopwatch{ "ThreadPooled" };
+
+    std::vector<std::future<Box>> results(pool.size());
+    const auto junkSize = polylines.size() / pool.size();
+    for (int i = 0; i < pool.size(); ++i)
+    {
+        auto begin = polylines.cbegin() + i * junkSize;
+        const auto end = begin + junkSize;
+
+        results[i] = pool.push([begin, end](int)
+            {
+                Box box{ begin->Points()[0] };
+                for (auto i = begin; i != end; ++i)
+                {
+                    for (const auto& point : i->Points())
+                    {
+                        box.Enclose(point);
+                    }
+                }
+
+                return box;
+            });
+    }
+
+    Box box{ polylines[0].Points()[0] };
+    for (auto& result : results)
+    {
+        box.Enclose(result.get());
+    }
+
+    return box;
+}
+
 int main(int argc, char* argv[])
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -136,6 +173,12 @@ int main(int argc, char* argv[])
     std::cout << " - " << Multithreaded(testData).Center() << "\n";
     std::cout << " - " << Multithreaded(testData).Center() << "\n";
     std::cout << " - " << Multithreaded(testData).Center() << "\n";
+
+    ctpl::thread_pool pool(8);
+    std::cout << " - " << ThreadPooled(testData, pool).Center() << "\n";
+    std::cout << " - " << ThreadPooled(testData, pool).Center() << "\n";
+    std::cout << " - " << ThreadPooled(testData, pool).Center() << "\n";
+    std::cout << " - " << ThreadPooled(testData, pool).Center() << "\n";
 
     return 0;
 }
