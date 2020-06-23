@@ -47,17 +47,13 @@ namespace PerformanceExample
 
         public Box Enclose(Box other)
         {
-            if (this.IsValid && other.IsValid)
+            if (other.IsValid)
             {
                 return this.Enclose(other.Min).Enclose(other.Max);
             }
-            else if (this.IsValid)
-            {
-                return this;
-            }
             else
             {
-                return other;
+                return this;
             }
         }
     }

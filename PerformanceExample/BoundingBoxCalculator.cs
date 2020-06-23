@@ -108,5 +108,13 @@ namespace PerformanceExample
         {
             return polylines.Aggregate(new Box(), (box, line) => box.Enclose(line.BoundingBox)).Center;
         }
+
+        public static Point3D CalculateV4(IEnumerable<Polyline> polylines)
+        {
+            return polylines
+                .AsParallel()
+                .Select(line => line.Aggregate(new Box(), (box, point) => box.Enclose(point)))
+                .Aggregate(new Box(), (b1, b2) => b1.Enclose(b2)).Center;
+        }
     }
 }
