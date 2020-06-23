@@ -9,6 +9,8 @@ namespace PerformanceExample
 {
     class Program
     {
+        private static readonly Random Random = new Random();
+
         static void Main()
         {
             Console.WriteLine("Program started.");
@@ -86,9 +88,11 @@ namespace PerformanceExample
             const int numberOfPoints = 1000;
 
             return Enumerable.Range(0, numberOfPolylines)
-                .Select(i => new Polyline(Enumerable.Range(0, numberOfPoints).Select(j => new Point3D(i + j, i + j, i + j))))
+                .Select(_ => new Polyline(Enumerable.Range(0, numberOfPoints).Select(__ => RandomPoint())))
                 .ToList();
         }
+
+        private static Point3D RandomPoint() => new Point3D(Random.NextDouble(), Random.NextDouble(), Random.NextDouble());
 
         private static void SleepABit(Object theObject)
         {
