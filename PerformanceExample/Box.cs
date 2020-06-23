@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Media.Media3D;
+﻿using System.Windows.Media.Media3D;
 
 namespace PerformanceExample
 {
@@ -24,13 +22,13 @@ namespace PerformanceExample
                 return new Box
                 {
                     Min = new Point3D(
-                        Math.Min(this.Min.X, point.X),
-                        Math.Min(this.Min.Y, point.Y),
-                        Math.Min(this.Min.Z, point.Z)),
+                        Util.Min(this.Min.X, point.X),
+                        Util.Min(this.Min.Y, point.Y),
+                        Util.Min(this.Min.Z, point.Z)),
                     Max = new Point3D(
-                        Math.Max(this.Max.X, point.X),
-                        Math.Max(this.Max.Y, point.Y),
-                        Math.Max(this.Max.Z, point.Z)),
+                        Util.Max(this.Max.X, point.X),
+                        Util.Max(this.Max.Y, point.Y),
+                        Util.Max(this.Max.Z, point.Z)),
                     IsValid = true,
                 };
             }
